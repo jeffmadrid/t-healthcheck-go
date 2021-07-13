@@ -9,7 +9,7 @@ import (
 func main() {
 	startTime := time.Now()
 	healthcheck.ReadConfig()
-	healthcheck.SendRequests()
+	healthcheck.SendContinuousRequests()
 	elapsedTime := time.Since(startTime)
 
 	log.Printf("Completed Full Program Execution in %s\n", elapsedTime)

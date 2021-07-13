@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 )
 
 func SendRequests() {
@@ -16,9 +17,24 @@ func SendRequests() {
 	wg.Wait()
 }
 
+func SendContinuousRequests() {
+	ticker := time.NewTicker(1 * time.Second)
+	go func() {
+		for range ticker.C {
+			log.Println("About to send requests to services")
+			SendRequests()
+			time.Sleep(1 * time.Minute)
+		}
+	}()
+
+	// wait for 24 hours to completely finish
+	time.Sleep(24 * time.Hour)
+	ticker.Stop()
+}
+
 func SendRequest(wg *sync.WaitGroup, service Service) {
 	defer wg.Done()
-	log.Printf("Sending request to %s with url %s", service.Name, service.Url)
+	log.Printf("Sending %s request to %s with url %s", service.Request.Method, service.Name, service.Url)
 
 	var response *http.Response
 	var err error

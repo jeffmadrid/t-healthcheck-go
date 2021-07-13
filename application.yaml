@@ -19,5 +19,21 @@ services:
         - key: sampleKey
           value: sampleValue
 
+  - name: httpbin-anything
+    url: https://httpbin.org/anything
+    request:
+      method: GET
+      header:
+        - key: sampleKey
+          value: sampleValue
+
+  - name: httpbin-anything
+    url: https://httpbin.org/anything
+    request:
+      method: HEAD
+      header:
+        - key: sampleKey
+          value: sampleValue
+
 
 # add support for dynamic scripts
