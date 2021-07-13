@@ -1,0 +1,23 @@
+application:
+  name: healthcheck-one
+  version: 0.1.0
+
+services:
+  - name: google
+    url: https://www.google.com
+    request:
+      method: GET
+      header:
+        - key: sampleKey
+          value: sampleValue
+
+  - name: example
+    url: https://example.com
+    request:
+      method: GET
+      header:
+        - key: sampleKey
+          value: sampleValue
+
+
+# add support for dynamic scripts
