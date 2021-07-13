@@ -1,6 +1,7 @@
 package healthcheck
 
 import (
+	"github.com/robfig/cron/v3"
 	"log"
 	"net/http"
 	"sync"
@@ -8,6 +9,8 @@ import (
 )
 
 func SendRequests() {
+	log.Println("About to send requests to check service availability")
+
 	var wg sync.WaitGroup
 	for _, service := range MainConfig.Services {
 		wg.Add(1)
@@ -15,15 +18,23 @@ func SendRequests() {
 	}
 
 	wg.Wait()
+	log.Println("Completed all service checks")
 }
 
 func SendContinuousRequests() {
-	ticker := time.NewTicker(1 * time.Second)
+	cronScheduler := cron.New()
+	cronScheduler.AddFunc("* * * * *", SendRequests)
+	cronScheduler.Start()
+	time.Sleep(24 * time.Hour)
+	cronScheduler.Stop()
+}
+
+func SendContinuousRequestsTickerVersion() {
+	ticker := time.NewTicker(1 * time.Minute)
 	go func() {
 		for range ticker.C {
 			log.Println("About to send requests to services")
 			SendRequests()
-			time.Sleep(1 * time.Minute)
 		}
 	}()
 
@@ -32,7 +43,7 @@ func SendContinuousRequests() {
 	ticker.Stop()
 }
 
-func SendRequest(wg *sync.WaitGroup, service Service) {
+func SendRequest(wg *sync.WaitGroup, service Service) bool {
 	defer wg.Done()
 	log.Printf("Sending %s request to %s with url %s", service.Request.Method, service.Name, service.Url)
 
@@ -49,4 +60,9 @@ func SendRequest(wg *sync.WaitGroup, service Service) {
 	}
 
 	log.Printf("Got response %s from %s\n", response.Status, service.Name)
+	if response.StatusCode == 200 {
+		return true
+	} else {
+		return false
+	}
 }
